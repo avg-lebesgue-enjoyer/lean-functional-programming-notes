@@ -1,2 +1,1 @@
-# lean-functional-programming-notes
-have
+# notes
