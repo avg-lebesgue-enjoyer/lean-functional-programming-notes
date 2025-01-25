@@ -111,7 +111,7 @@ instance : Applicative (Validate ε) where
     | .errors ea => .errors $ ef ++ ea
 
 -- Okay, more programming
-def Field := String
+abbrev Field := String
 def reportError (field : Field) (message : String) : Validate (Field × String) α :=
   .errors ⟨[(field, message)], by simp⟩
 
