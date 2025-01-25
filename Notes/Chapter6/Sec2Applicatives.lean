@@ -136,7 +136,7 @@ def checkBirthYear (currentYear yearToValidate : Nat) : Validate (Field × Strin
 def checkInput (currentYear : Nat) (rawInput : RawInput) : Validate (Field × String) (CheckedInput currentYear) :=
   pure CheckedInput.mk
   <*> checkName (rawInput.name)
-  <*> (Validate.andThen (checkYearIsNat rawInput.birthYear) (checkBirthYear currentYear))
+  <*> (checkYearIsNat rawInput.birthYear).andThen (checkBirthYear currentYear)
 
 #print RawInput
 def example0 : RawInput where
@@ -155,3 +155,27 @@ def example3 : RawInput where
 #eval checkInput 2000 example1
 #eval checkInput 2000 example2
 #eval checkInput 2000 example3
+
+
+
+/- SECTION: Applicative ⇒ Functor -/
+
+-- We can do this
+instance [Applicative m] : Functor m where
+  map f ma := pure f <*> ma
+-- In fact, Lean has:
+/-
+  ` class Applicative (m : Type u → Type v) : Type (max (u + 1) v) extends Functor m where`
+  `   pure : α → m α                        `
+  `   seq : m (α → β) → (Uint → m α) → m β  `
+  `   map f ma := pure f <*> ma             `
+-/
+-- Except it doesn't, really. It splits those up into
+/-
+  ` Applicative.mk                                                            `
+  `   : {f : Type u → Type v}                                                 `
+  `   → [toFunctor : Functor f]                                               `
+  `   → [toPure : Pure f]                                                     `
+  `   → [toSeq : Seq f] → [toSeqLeft : SeqLeft f] → [toSeqRight : SeqRight f] `
+  `   → Applicative f                                                         `
+-/
